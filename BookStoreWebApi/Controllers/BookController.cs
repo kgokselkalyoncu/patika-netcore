@@ -5,6 +5,7 @@ using BookStoreWebApi.Models;
 using BookStoreWebApi.BookOperations.GetBooks;
 using BookStoreWebApi.BookOperations.CreateBook;
 using BookStoreWebApi.BookOperations.UpdateBook;
+using BookStoreWebApi.BookOperations.DeleteBook;
 
 namespace BookStoreWebApi;
 
@@ -67,14 +68,6 @@ public class BookController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet]
-    [Route("Get/")]
-    public Book? Get([FromQuery] string id)
-    {
-        Book? book = _context.Books.Where(x => x.Id == Convert.ToInt32(id)).SingleOrDefault();
-        return book;
-    }
-
     [HttpPost]
     public IActionResult AddBook([FromBody] CreateBookModel newBook)
     {
@@ -114,13 +107,15 @@ public class BookController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult DeleteBook(int id)
     {
-        Book? book = _context.Books.SingleOrDefault(x => x.Id == id);
+        DeleteBookCommand deleteBook = new DeleteBookCommand(_context);
 
-        if(book is null)
-            return BadRequest();
+        try{
+            deleteBook.Handle(id);
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
 
-        _context.Books.Remove(book);
-        _context.SaveChanges();
         return Ok();
     }
 
