@@ -6,6 +6,7 @@ using BookStoreWebApi.BookOperations.GetBooks;
 using BookStoreWebApi.BookOperations.CreateBook;
 using BookStoreWebApi.BookOperations.UpdateBook;
 using BookStoreWebApi.BookOperations.DeleteBook;
+using AutoMapper;
 
 namespace BookStoreWebApi;
 
@@ -14,40 +15,17 @@ namespace BookStoreWebApi;
 public class BookController : ControllerBase
 {
     private readonly BookStoreDbContext _context;
+    private readonly IMapper _mapper;
 
-    // private static List<Book> BookList = new List<Book>()
-    // {
-    //     new Book{
-    //         Id = 1,
-    //         Title = "Test",
-    //         GenreId = 1,
-    //         PageCount = 200,
-    //         PublishDate = new DateTime(2001,06,12)
-    //     },
-    //     new Book{
-    //         Id = 2,
-    //         Title = "aaa",
-    //         GenreId = 1,
-    //         PageCount = 300,
-    //         PublishDate = new DateTime(2010,07,05)
-    //     },
-    //     new Book{
-    //         Id = 3,
-    //         Title = "bbb",
-    //         GenreId = 1,
-    //         PageCount = 500,
-    //         PublishDate = new DateTime(2011,03,19)
-    //     }
-    // };
-
-    public BookController(BookStoreDbContext context){
+    public BookController(BookStoreDbContext context, IMapper mapper){
         _context = context;
+        _mapper = mapper;
     }
 
     [HttpGet]
     public IActionResult GetBooks()
     {
-        GetBooksQuery getBooksQuery = new GetBooksQuery(_context);
+        GetBooksQuery getBooksQuery = new GetBooksQuery(_context, _mapper);
         List<BooksViewModel> result = getBooksQuery.Handle();
         return Ok(result);
     }
@@ -55,7 +33,7 @@ public class BookController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
-        GetBooksQuery getBooksQuery = new GetBooksQuery(_context);
+        GetBooksQuery getBooksQuery = new GetBooksQuery(_context, _mapper);
         BooksViewModel result = new BooksViewModel();
         try{
             result = getBooksQuery.Handle(id);
@@ -71,7 +49,7 @@ public class BookController : ControllerBase
     [HttpPost]
     public IActionResult AddBook([FromBody] CreateBookModel newBook)
     {
-        CreateBookCommand createBookCommand = new CreateBookCommand(_context);
+        CreateBookCommand createBookCommand = new CreateBookCommand(_context, _mapper);
 
         try{
 
