@@ -7,6 +7,9 @@ using BookStoreWebApi.BookOperations.CreateBook;
 using BookStoreWebApi.BookOperations.UpdateBook;
 using BookStoreWebApi.BookOperations.DeleteBook;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
+
 
 namespace BookStoreWebApi;
 
@@ -54,8 +57,28 @@ public class BookController : ControllerBase
         try{
 
             createBookCommand.Model = newBook;
-            createBookCommand.Handle();
+            CreateBookCommandValidator validations = new CreateBookCommandValidator();
+            validations.ValidateAndThrow(createBookCommand);
 
+            createBookCommand.Handle();
+            // ValidationResult result = validations.Validate(createBookCommand);
+
+            // if(!result.IsValid){
+            //     string errorMessage = "";
+            //     foreach (ValidationFailure item in result.Errors)
+            //     {
+            //         // Console.WriteLine("Özellik :" + item.PropertyName);
+            //         // Console.WriteLine("Error Code :" + item.ErrorCode);
+            //         // Console.WriteLine("Error Message :" + item.ErrorMessage);
+
+            //         errorMessage += item.ErrorMessage + "\n";
+            //     }
+
+            //     return BadRequest(errorMessage);
+            // }
+            // else{
+            //     createBookCommand.Handle();
+            // }
         }
         catch(Exception ex){
             return BadRequest(ex.Message);
