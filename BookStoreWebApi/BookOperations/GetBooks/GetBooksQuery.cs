@@ -11,6 +11,7 @@ public class GetBooksQuery
     private readonly BookStoreDbContext _dbContext;
     private readonly IMapper _mapper;
 
+    public int BookId {get; set;}
     public GetBooksQuery(BookStoreDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
@@ -25,9 +26,9 @@ public class GetBooksQuery
         return vm;
     }
 
-    public BooksViewModel Handle(int id)
+    public BooksViewModel HandleGetById()
     {
-        Book? book = _dbContext.Books.Find(id);
+        Book? book = _dbContext.Books.Find(this.BookId);
         
         if(book is null)
             throw new InvalidOperationException("Kitap bulunamadı.");
